@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}All Data - Fitness App{% endblock %}
+{% block title %}All Data - Stay Fit in Your 40s{% endblock %}
 
 {% block style %}
 <style>
     .container {
-        max-width: 1200px;
-        margin: 20px auto;
+        max-width: 95%;
+        margin: 10px auto;
         background: white;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -16,6 +16,7 @@
     .tabs {
         display: flex;
         background: #4CAF50;
+        flex-wrap: wrap;
     }
 
     .tabs button {
@@ -25,7 +26,7 @@
         border: none;
         color: white;
         cursor: pointer;
-        font-size: 18px;
+        font-size: 16px;
         transition: background 0.3s;
     }
 
@@ -35,7 +36,7 @@
 
     .tab-content {
         display: none;
-        padding: 20px;
+        padding: 10px;
     }
 
     .tab-content.active {
@@ -45,12 +46,12 @@
     table {
         width: 100%;
         border-collapse: collapse;
-        margin: 20px 0;
+        margin: 10px 0;
     }
 
     table th, table td {
         text-align: left;
-        padding: 12px;
+        padding: 8px;
         border: 1px solid #ddd;
     }
 
@@ -69,10 +70,72 @@
 
     h2 {
         margin: 0;
-        padding: 20px;
+        padding: 15px;
         text-align: center;
         background: #4CAF50;
         color: white;
+    }
+
+    /* Responsive Styling */
+    @media (max-width: 768px) {
+        .tabs button {
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        table th, table td {
+            font-size: 12px;
+            padding: 6px;
+        }
+
+        table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tabs button {
+            font-size: 12px;
+            padding: 8px;
+        }
+
+        table th, table td {
+            font-size: 10px;
+            padding: 4px;
+        }
+
+        table {
+            font-size: 10px;
+        }
+    }
+
+    /* Additional Mobile-Friendly Adjustments */
+    @media (max-width: 480px) {
+        .tab-content table {
+            display: block;
+            overflow-x: auto;
+        }
+
+        table th {
+            font-size: 10px;
+            word-wrap: break-word;
+        }
+
+        table td {
+            font-size: 10px;
+            word-wrap: break-word;
+        }
+
+        .tabs button {
+            padding: 8px;
+        }
+
+        h2 {
+            font-size: 14px;
+            padding: 10px;
+        }
     }
 </style>
 {% endblock %}
@@ -80,12 +143,12 @@
 {% block content %}
 <div class="container">
     <div class="tabs">
-        <button class="tab-button active" data-tab="user-data">User Data</button>
-        <button class="tab-button" data-tab="training-activities">Training Activities</button>
+        <button class="tab-button active" data-tab="user-data">Stats</button>
+        <button class="tab-button" data-tab="training-activities">Activities</button>
     </div>
 
     <div id="user-data" class="tab-content active">
-        <h2>User Data</h2>
+        
         <table>
             <thead>
                 <tr>
@@ -93,8 +156,7 @@
                     <th>Weight</th>
                     <th>Sleep</th>
                     <th>Steps</th>
-                    <th>Intake</th>
-                    <th>Burn</th>
+                    <th>Intake/Burn</th>
                     <th>Meals</th>
                     <th>Last Meal</th>
                 </tr>
@@ -106,8 +168,7 @@
                     <td>{{ data.weight }}</td>
                     <td>{{ data.sleep }}</td>
                     <td>{{ data.steps }}</td>
-                    <td>{{ data.calories_in }}</td>
-                    <td>{{ data.calories_out }}</td>
+                    <td>{{ data.calories_in }}/{{ data.calories_out }}</td>
                     <td>{{ data.number_of_meals }}</td>
                     <td>{{ data.time_of_last_meal }}</td>
                 </tr>
@@ -117,7 +178,7 @@
     </div>
 
     <div id="training-activities" class="tab-content">
-        <h2>Training Activities</h2>
+        
         <table>
             <thead>
                 <tr>
@@ -126,7 +187,6 @@
                     <th>Activity Type</th>
                     <th>Sport Specific</th>
                     <th>Recovery Type</th>
-                  
                 </tr>
             </thead>
             <tbody>
@@ -137,7 +197,6 @@
                     <td>{{ activity.activity_type }}</td>
                     <td>{{ activity.sport_specific }}</td>
                     <td>{{ activity.recovery_type }}</td>
-                   
                 </tr>
                 {% endfor %}
             </tbody>
