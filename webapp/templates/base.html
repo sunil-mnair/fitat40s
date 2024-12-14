@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Fit at 40s{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #4CAF50;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #333;
+            color: #fff;
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 1rem;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr 3fr;
+            }
+        }
+
+        .sidebar {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin: 1rem 0;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar ul li a i {
+            margin-right: 0.5rem;
+        }
+
+        .content {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            display: inline-block;
+            background: #4CAF50;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #45a049;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem 0;
+            background: #333;
+            color: #fff;
+            margin-top: 2rem;
+        }
+
+        .flash-message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f8d7da;
+            color: #721c24;
+            border-radius: 5px;
+        }
+    </style>
+    {% block style %}
+    {% endblock %}
+</head>
+<body>
+    <!-- <header>
+        <h1>Fit at 40s</h1>
+    </header> -->
+
+    <nav>
+        <div class="logo">Fitat40s</div>
+        <ul>
+            <li><a href="/dashboard">Home</a></li>
+            <!-- <li><a href="#">Profile</a></li> -->
+            {% if current_user.is_authenticated %}
+            <li><a href="/logout">Logout</a></li>
+            {%else%}
+            <li><a href="/login">Login</a></li>
+            {%endif%}
+        </ul>
+    </nav>
+
+    <div class="container">
+        {% block flash_message %}
+        <div class="flash-message">
+            Welcome to your Fitness Dashboard! Track your data and stay healthy.
+        </div>
+        {% endblock %}
+
+        <div class="dashboard">
+            <div class="sidebar">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="/all-data"><i class="fas fa-database"></i> All Data</a></li>
+                    <li><a href="/progress"><i class="fas fa-chart-line"></i> Progress</a></li>
+                </ul>
+            </div>
+
+            <div class="content">
+                {% block content %}
+                <h2>Dashboard</h2>
+                <p>Here you can see your progress, add new workouts, and view your fitness goals.</p>
+                <a href="#" class="btn">Get Started</a>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Fit-at-40s</p>
+    </footer>
+</body>
+<script>
+    // Example JavaScript for interactivity
+    document.querySelector('.btn').addEventListener('click', function() {
+        alert('Get ready to track your fitness journey!');
+    });
+</script>
+
+{% block script %}
+{% endblock %}
+
+</html>

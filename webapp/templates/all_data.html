@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}All Data - Fitness App{% endblock %}
+
+{% block style %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .tabs {
+        display: flex;
+        background: #4CAF50;
+    }
+
+    .tabs button {
+        flex: 1;
+        padding: 15px;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 18px;
+        transition: background 0.3s;
+    }
+
+    .tabs button.active {
+        background: #3e8e41;
+    }
+
+    .tab-content {
+        display: none;
+        padding: 20px;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+
+    table th, table td {
+        text-align: left;
+        padding: 12px;
+        border: 1px solid #ddd;
+    }
+
+    table th {
+        background: #4CAF50;
+        color: white;
+    }
+
+    table tr:nth-child(even) {
+        background: #f9f9f9;
+    }
+
+    table tr:hover {
+        background: #f1f1f1;
+    }
+
+    h2 {
+        margin: 0;
+        padding: 20px;
+        text-align: center;
+        background: #4CAF50;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="tabs">
+        <button class="tab-button active" data-tab="user-data">User Data</button>
+        <button class="tab-button" data-tab="training-activities">Training Activities</button>
+    </div>
+
+    <div id="user-data" class="tab-content active">
+        <h2>User Data</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Weight</th>
+                    <th>Sleep</th>
+                    <th>Steps</th>
+                    <th>Intake</th>
+                    <th>Burn</th>
+                    <th>Meals</th>
+                    <th>Last Meal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in all_user_data %}
+                <tr>
+                    <td>{{ data.date }}</td>
+                    <td>{{ data.weight }}</td>
+                    <td>{{ data.sleep }}</td>
+                    <td>{{ data.steps }}</td>
+                    <td>{{ data.calories_in }}</td>
+                    <td>{{ data.calories_out }}</td>
+                    <td>{{ data.number_of_meals }}</td>
+                    <td>{{ data.time_of_last_meal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="training-activities" class="tab-content">
+        <h2>Training Activities</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Body Area</th>
+                    <th>Activity Type</th>
+                    <th>Sport Specific</th>
+                    <th>Recovery Type</th>
+                  
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in all_training_activities %}
+                <tr>
+                    <td>{{ activity.date }}</td>
+                    <td>{{ activity.body_area }}</td>
+                    <td>{{ activity.activity_type }}</td>
+                    <td>{{ activity.sport_specific }}</td>
+                    <td>{{ activity.recovery_type }}</td>
+                   
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            button.classList.add('active');
+            document.getElementById(button.dataset.tab).classList.add('active');
+        });
+    });
+</script>
+{% endblock %}

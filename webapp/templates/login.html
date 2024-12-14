@@ -1,0 +1,50 @@
+<!-- login.html -->
+{% extends "base.html" %}
+
+{% block title %}Login - Fitness App{% endblock %}
+
+{% block style %}
+<style>
+    .form-container {
+        max-width: 400px;
+        margin: auto;
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container input, .form-container button {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .form-container button {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .form-container button:hover {
+        background: #45a049;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Login</h1>
+<form action="/login" method="post" class="form-container">
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required><br>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required><br>
+
+    <button type="submit">Login</button>
+</form>
+<p style="text-align: center; margin-top: 10px;">Don't have an account? <a href="/register">Register</a>.</p>
+{% endblock %}

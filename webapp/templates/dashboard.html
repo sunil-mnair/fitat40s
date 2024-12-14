@@ -1,0 +1,305 @@
+<!-- dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Fitness App{% endblock %}
+
+{% block style %}
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: auto;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .dashboard-container h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #4CAF50;
+    }
+
+    .dashboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    .dashboard-table th, .dashboard-table td {
+        text-align: left;
+        padding: 12px;
+        border: 1px solid #ddd;
+    }
+
+    .dashboard-table th {
+        background-color: #f4f4f4;
+        color: #333;
+    }
+
+    .dashboard-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .form-container {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container input, .form-container fieldset, .form-container button {
+        width: 100%;
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .form-container fieldset {
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    .form-container button {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .form-container button:hover {
+        background: #45a049;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h1>Welcome, {{ current_user.name }}</h1>
+    
+    {% if last_entry %}
+    <button id="edit-last-entry-btn">Edit Entry</button>
+    {% else %}
+    <p>No entries available to edit.</p>
+    {% endif %}
+
+    <h2>Recent Stat</h2>
+    <table class="dashboard-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Weight</th>
+                <th>Sleep (hours)</th>
+                <th>Steps</th>
+                <th>Intake/Burn</th>
+                <th>Meals</th>
+               
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td>{{ user_data.date }}</td>
+                <td>{{ user_data.weight }}</td>
+                <td>{{ user_data.sleep }}</td>
+                <td>{{ user_data.steps }}</td>
+                <td>{{ user_data.calories_in }}/{{ user_data.calories_out }}</td>
+                <td>{{ user_data.number_of_meals }}</td>
+                
+            </tr>
+            
+        </tbody>
+    </table>
+
+    <h2>Recent Activity</h2>
+    <table class="dashboard-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Body Area</th>
+                <th>Activity Type</th>
+                <th>Sport Specific</th>
+                <th>Recovery Type</th>
+               
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td>{{ training_activity.date }}</td>
+                <td>{{ training_activity.body_area }}</td>
+                <td>{{ training_activity.activity_type }}</td>
+                <td>{{ training_activity.sport_specific }}</td>
+                <td>{{ training_activity.recovery_type }}</td>
+                
+            </tr>
+            
+        </tbody>
+    </table>
+
+    
+
+    <h2>Add New Data</h2>
+    <form action="/dashboard" method="post" class="form-container">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required><br>
+
+        <label for="weight">Weight (in kg):</label>
+        <input type="number" id="weight" name="weight" step="0.1" value={{user_data.weight}} required><br>
+
+        <label for="sleep">Sleep (in hours):</label>
+        <input type="number" id="sleep" name="sleep" step="0.1" required><br>
+
+        <label for="steps">Steps:</label>
+        <input type="number" id="steps" name="steps" required><br>
+
+        <label for="calories_in">Calories In:</label>
+        <input type="number" id="calories_in" name="calories_in" step="1" required><br>
+
+        <label for="calories_out">Calories Out:</label>
+        <input type="number" id="calories_out" name="calories_out" step="1" required><br>
+
+        <label for="number_of_meals">Number of Meals:</label>
+        <input type="number" id="number_of_meals" name="number_of_meals" min="1" max="5" required><br>
+
+        <label for="time_of_last_meal">Time of Last Meal:</label>
+        <input type="time" id="time_of_last_meal" name="time_of_last_meal" required><br>
+
+
+        <fieldset>
+            <legend>Body Area</legend>
+            <label><input type="checkbox" name="body_area" value="Upper Body"> Upper Body</label><br>
+            <label><input type="checkbox" name="body_area" value="Lower Body"> Lower Body</label><br>
+            <label><input type="checkbox" name="body_area" value="Full Body"> Full Body</label><br>
+            <label><input type="checkbox" name="body_area" value="Core/Abs"> Core/Abs</label><br>
+        </fieldset>
+
+        <fieldset>
+            <legend>Activity Type</legend>
+            <label><input type="checkbox" name="activity_type" value="Cardio"> Cardio</label><br>
+            <label><input type="checkbox" name="activity_type" value="Strength Training"> Strength Training</label><br>
+            <label><input type="checkbox" name="activity_type" value="Flexibility/Mobility"> Flexibility/Mobility</label><br>
+            <label><input type="checkbox" name="activity_type" value="HIIT"> HIIT</label><br>
+            <label><input type="checkbox" name="activity_type" value="Endurance"> Endurance</label><br>
+        </fieldset>
+
+        <fieldset>
+            <legend>Sport Specific</legend>
+            <label><input type="checkbox" name="sport_specific" value="Basketball"> Basketball</label><br>
+            <label><input type="checkbox" name="sport_specific" value="Soccer"> Soccer</label><br>
+            <label><input type="checkbox" name="sport_specific" value="Tennis"> Tennis</label><br>
+            <label><input type="checkbox" name="sport_specific" value="Swimming"> Swimming</label><br>
+            <label><input type="checkbox" name="sport_specific" value="Other Sport"> Other Sport</label><br>
+        </fieldset>
+
+        <fieldset>
+            <legend>Recovery</legend>
+            <label><input type="checkbox" name="recovery" value="Active Recovery"> Active Recovery</label><br>
+            <label><input type="checkbox" name="recovery" value="Rest Day"> Rest Day</label><br>
+        </fieldset>
+
+        <button type="submit">Add Data</button>
+    </form>
+</div>
+
+<!-- Modal for editing last entry -->
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Edit Last Entry</h2>
+        <form action="/dashboard/edit" method="post" class="form-container">
+            <input type="hidden" name="id" value="{{ last_entry.id }}">
+
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" value="{{ last_entry.date }}" required><br>
+
+            <label for="weight">Weight (in kg):</label>
+            <input type="number" id="weight" name="weight" value="{{ last_entry.weight }}" step="0.1" required><br>
+
+            <label for="sleep">Sleep (in hours):</label>
+            <input type="number" id="sleep" name="sleep" value="{{ last_entry.sleep }}" step="0.1" required><br>
+
+            <label for="steps">Steps:</label>
+            <input type="number" id="steps" name="steps" value="{{ last_entry.steps }}" required><br>
+
+            <label for="calories_in">Calories In:</label>
+            <input type="number" id="calories_in" name="calories_in" value="{{ last_entry.calories_in }}" step="0.1" required><br>
+
+            <label for="calories_out">Calories Out:</label>
+            <input type="number" id="calories_out" name="calories_out" value="{{ last_entry.calories_out }}" step="0.1" required><br>
+
+            <label for="number_of_meals">Number of Meals:</label>
+            <input type="number" id="number_of_meals" name="number_of_meals" value="{{ last_entry.number_of_meals }}" min="1" max="5" required><br>
+
+            <label for="time_of_last_meal">Time of Last Meal:</label>
+            <input type="time" id="time_of_last_meal" name="time_of_last_meal" value="{{ last_entry.time_of_last_meal }}" required><br>
+
+            <button type="submit">Update Entry</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{%block script%}
+
+<script>
+    const modal = document.getElementById('edit-modal');
+    const btn = document.getElementById('edit-last-entry-btn');
+    const span = document.getElementsByClassName('close')[0];
+
+    // Open the modal when the button is clicked
+    btn.onclick = function () {
+        modal.style.display = 'block';
+    };
+
+    // Close the modal when the user clicks on <span> (x)
+    span.onclick = function () {
+        modal.style.display = 'none';
+    };
+
+    // Close the modal when the user clicks anywhere outside of the modal
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    };
+</script>
+
+{%endblock%}
