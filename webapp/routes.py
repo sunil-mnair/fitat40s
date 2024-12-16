@@ -34,6 +34,11 @@ class UserData(db.Model):
     calories_in = db.Column(db.Float, nullable=False)
     calories_out = db.Column(db.Float, nullable=False)
 
+    protein = db.Column(db.Integer, nullable=True)
+    carbs = db.Column(db.Integer, nullable=True)
+    fat = db.Column(db.Integer, nullable=True)
+
+
     number_of_meals = db.Column(db.Integer, nullable=False)
     time_of_last_meal = db.Column(db.Time, nullable=False)
 
@@ -74,26 +79,17 @@ def register():
 
         try:
             logging.debug(request.form)  # Log form data
-            print("Post Test")
-            name = request.form['name']
-            print(name)
-            dob = datetime.strptime(request.form['dob'], '%Y-%m-%d') 
-            print(dob)
-            height = request.form['height']
-            print(height)
-            weight = request.form['weight']
-            print(weight)
-            nickname = request.form['nickname']
-            print(nickname)
-            diet_type = request.form['diet']
-            print(diet_type)
             
+            name = request.form['name']
+            dob = datetime.strptime(request.form['dob'], '%Y-%m-%d') 
+            height = request.form['height']
+            weight = request.form['weight']
+            nickname = request.form['nickname']
+            diet_type = request.form['diet']
+           
             email = request.form['email']
-            print(email)
+        
             password = request.form['password']
-            print(password)
-
-            print("Collected all Data")
             
             hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
             new_user = User(name=name, dob=dob, height=height, weight=weight, nickname=nickname, diet_type=diet_type, email=email, password=hashed_password)
@@ -110,9 +106,7 @@ def register():
             logging.error(f"Registration error: {e}")
             flash('Registration failed. Check your input and try again.', 'danger')
 
-        
 
-        
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -151,6 +145,9 @@ def dashboard():
         sleep = request.form['sleep']
         steps = request.form['steps']
         calories_in = request.form['calories_in']
+        protein = request.form['protein']
+        carbs = request.form['carbs']
+        fat = request.form['fat']
         calories_out = request.form['calories_out']
 
         number_of_meals = request.form['number_of_meals']
@@ -181,6 +178,7 @@ def dashboard():
             sleep=sleep,
             steps=steps,
             calories_in=calories_in,
+            protein=protein,carbs=carbs,fat=fat,
             calories_out=calories_out,
             number_of_meals=number_of_meals,
             time_of_last_meal=time_of_last_meal
@@ -298,6 +296,9 @@ def edit_last_entry():
         entry.sleep = request.form['sleep']
         entry.steps = request.form['steps']
         entry.calories_in = request.form['calories_in']
+        entry.protein= request.form['protein']
+        entry.carbs= request.form['carbs']
+        entry.fat= request.form['fat']
         entry.calories_out = request.form['calories_out']
         entry.number_of_meals = request.form['number_of_meals']
         time_of_last_meal_str = request.form['time_of_last_meal']
@@ -326,6 +327,42 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
+
+# from flask_mail import Mail, Message
+# import secrets  # For generating secure tokens
+
+# # Mail Configuration
+# app.config['MAIL_SERVER'] = 'smtp.example.com'
+# app.config['MAIL_PORT'] = 587
+# app.config['MAIL_USE_TLS'] = True
+# app.config['MAIL_USERNAME'] = 'your_email@example.com'
+# app.config['MAIL_PASSWORD'] = 'your_password'
+# mail = Mail(app)
+
+# @app.route('/forgot-password', methods=['GET', 'POST'])
+# def forgot_password():
+#     if request.method == 'POST':
+#         email = request.form['email']
+#         user = User.query.filter_by(email=email).first()
+
+#         if user:
+#             # Generate a secure token
+#             token = secrets.token_urlsafe(16)
+#             user.reset_token = token  # Assuming `reset_token` is a column in your `User` model
+#             db.session.commit()
+
+#             # Send reset password email
+#             reset_link = url_for('reset_password', token=token, _external=True)
+#             msg = Message('Reset Your Password', sender='your_email@example.com', recipients=[email])
+#             msg.body = f"Click the link to reset your password: {reset_link}"
+#             mail.send(msg)
+
+#             flash('A password reset email has been sent.', 'info')
+#             return redirect(url_for('login'))
+#         else:
+#             flash('Email not found.', 'danger')
+#     return render_template('forgot_password.html')
+
 
 # Initialize database
 with app.app_context():
