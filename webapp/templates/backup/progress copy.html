@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Progress Tracker{% endblock %}
+
+{% block style %}
+<style>
+    .progress-container {
+        padding: 20px;
+        max-width: 90%;
+        margin: 0 auto;
+    }
+
+    #progress-form {
+        margin-bottom: 20px;
+    }
+
+    .form-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: space-between;
+    }
+
+    .form-grid div {
+        flex: 1 1 calc(33.333% - 10px);
+        min-width: 120px;
+    }
+
+    button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 400px;
+    }
+
+    @media (max-width: 768px) {
+        .form-grid div {
+            flex: 1 1 100%;
+        }
+
+        .chart-container {
+            height: 300px;
+        }
+    }
+</style>
+{% endblock%}
+
+{% block content %}
+<div class="progress-container">
+    <!-- <p>Select a metric and timeline</p> -->
+
+    <form id="progress-form">
+        <label for="metric">Metric:</label>
+        <select id="metric" name="metric">
+            <option value="weight">Weight</option>
+            <option value="sleep">Sleep</option>
+            <option value="steps">Steps</option>
+            <option value="calories">Calories (In vs Out)</option>
+            <option value="pcf">PCF</option>
+            <option value="number_of_meals">Number of Meals</option>
+        </select>
+
+        <label for="view">Timeline:</label>
+        <select id="view" name="view">
+            <option value="days">Days</option>
+            <option value="weeks">Weeks</option>
+            <option value="months">Months</option>
+        </select>
+
+        <button type="button" id="update-chart">Update Chart</button>
+    </form>
+
+    <div class="chart-container">
+        <canvas id="progress-chart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.getElementById('update-chart').addEventListener('click', () => {
+        const metric = document.getElementById('metric').value;
+        const view = document.getElementById('view').value;
+
+        fetch(`/progress-data?metric=${metric}&view=${view}`)
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('progress-chart').getContext('2d');
+                if (window.progressChart) {
+                    window.progressChart.destroy();
+                }
+
+                // Handle Calories (In vs Out) as a special case
+                if (metric === 'calories') {
+                    window.progressChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [
+                                {
+                                    label: 'Calories In',
+                                    data: data.data.calories_in,
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    borderWidth: 2,
+                                    tension: 0.3,
+                                },
+                                {
+                                    label: 'Calories Out',
+                                    data: data.data.calories_out,
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    borderWidth: 2,
+                                    tension: 0.3,
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                },
+                            },
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Date',
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Calories',
+                                    },
+                                    beginAtZero: true,
+                                }
+                            }
+                        }
+                    });
+                } else if(metric === 'pcf'){
+                    window.progressChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [
+                                {
+                                    label: 'Protein',
+                                    data: data.data.protein,
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    borderWidth: 2,
+                                    tension: 0.3,
+                                },
+                                {
+                                    label: 'Carbs',
+                                    data: data.data.carbs,
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    borderWidth: 2,
+                                    tension: 0.3,
+                                },
+                                {
+                                    label: 'Fat',
+                                    data: data.data.fat,
+                                    borderColor: 'rgba(175, 192, 192, 1)',
+                                    backgroundColor: 'rgba(175, 192, 192, 0.2)',
+                                    borderWidth: 2,
+                                    tension: 0.3,
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                },
+                            },
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Date',
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'PCF',
+                                    },
+                                    beginAtZero: true,
+                                }
+                            }
+                        }
+                    });
+                }
+                else {
+                    // General case for other metrics
+                    window.progressChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: metric.charAt(0).toUpperCase() + metric.slice(1),
+                                data: data.data,
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                },
+                            },
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Date',
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: metric.charAt(0).toUpperCase() + metric.slice(1),
+                                    },
+                                    beginAtZero: true,
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+    });
+</script>
+
+
+
+{% endblock %}

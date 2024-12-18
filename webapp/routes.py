@@ -229,13 +229,18 @@ def progress_data():
     user_data = UserData.query.filter_by(user_id=current_user.id).order_by(UserData.date).all()
 
     labels = []
-    data_points = {'calories_in': [], 'calories_out': []} if metric == 'calories' else []
+    data_points = {'calories_in': [], 'calories_out': []} if metric == 'calories' else \
+                  {'protein': [], 'carbs': [], 'fat': []} if metric == 'pcf' else []
 
     if view == 'days':
         labels = [data.date.strftime('%Y-%m-%d') for data in user_data]
         if metric == 'calories':
             data_points['calories_in'] = [data.calories_in for data in user_data]
             data_points['calories_out'] = [data.calories_out for data in user_data]
+        elif metric == 'pcf':
+            data_points['protein'] = [data.protein for data in user_data]
+            data_points['carbs'] = [data.carbs for data in user_data]
+            data_points['fat'] = [data.fat for data in user_data]
         else:
             data_points = [getattr(data, metric) for data in user_data]
 
@@ -254,6 +259,16 @@ def progress_data():
             ]
             data_points['calories_out'] = [
                 sum(data.calories_out for data in week) / len(week) for week in weekly_data.values()
+            ]
+        elif metric == 'pcf':
+            data_points['protein'] = [
+                sum(data.protein for data in week if data.protein) / len(week) for week in weekly_data.values()
+            ]
+            data_points['carbs'] = [
+                sum(data.carbs for data in week if data.carbs) / len(week) for week in weekly_data.values()
+            ]
+            data_points['fat'] = [
+                sum(data.fat for data in week if data.fat) / len(week) for week in weekly_data.values()
             ]
         else:
             data_points = [
@@ -276,12 +291,23 @@ def progress_data():
             data_points['calories_out'] = [
                 sum(data.calories_out for data in month) / len(month) for month in monthly_data.values()
             ]
+        elif metric == 'pcf':
+            data_points['protein'] = [
+                sum(data.protein for data in month if data.protein) / len(month) for month in monthly_data.values()
+            ]
+            data_points['carbs'] = [
+                sum(data.carbs for data in month if data.carbs) / len(month) for month in monthly_data.values()
+            ]
+            data_points['fat'] = [
+                sum(data.fat for data in month if data.fat) / len(month) for month in monthly_data.values()
+            ]
         else:
             data_points = [
                 sum(getattr(data, metric) for data in month) / len(month) for month in monthly_data.values()
             ]
 
     return jsonify({'labels': labels, 'data': data_points})
+
 
 
 @app.route('/dashboard/edit', methods=['POST'])

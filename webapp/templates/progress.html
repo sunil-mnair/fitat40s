@@ -43,6 +43,10 @@
     .chart-container {
         position: relative;
         height: 400px;
+        margin-top: 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     @media (max-width: 768px) {
@@ -54,12 +58,29 @@
             height: 300px;
         }
     }
+
+    @media (max-width: 480px) {
+        .chart-container {
+            height: 250px;
+            padding: 10px;
+        }
+
+        #progress-form {
+            margin-bottom: 15px;
+        }
+
+        button {
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+    }
 </style>
-{% endblock%}
+{% endblock %}
+
 
 {% block content %}
 <div class="progress-container">
-    <p>Select a metric and view type to see your progress.</p>
+    <!-- <p>Select a metric and timeline</p> -->
 
     <form id="progress-form">
         <label for="metric">Metric:</label>
@@ -68,10 +89,11 @@
             <option value="sleep">Sleep</option>
             <option value="steps">Steps</option>
             <option value="calories">Calories (In vs Out)</option>
+            <option value="pcf">PCF</option>
             <option value="number_of_meals">Number of Meals</option>
         </select>
 
-        <label for="view">View By:</label>
+        <label for="view">Timeline:</label>
         <select id="view" name="view">
             <option value="days">Days</option>
             <option value="weeks">Weeks</option>
@@ -100,100 +122,109 @@
                     window.progressChart.destroy();
                 }
 
-                // Handle Calories (In vs Out) as a special case
-                if (metric === 'calories') {
-                    window.progressChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: data.labels,
-                            datasets: [
-                                {
-                                    label: 'Calories In',
-                                    data: data.data.calories_in,
-                                    borderColor: 'rgba(75, 192, 192, 1)',
-                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                    borderWidth: 2,
-                                    tension: 0.3,
-                                },
-                                {
-                                    label: 'Calories Out',
-                                    data: data.data.calories_out,
-                                    borderColor: 'rgba(255, 99, 132, 1)',
-                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                    borderWidth: 2,
-                                    tension: 0.3,
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'top',
+                const isPCF = metric === 'pcf';
+                const isCalories = metric === 'calories';
+
+                const datasets = isPCF ? [
+                    {
+                        label: 'Protein',
+                        data: data.data.protein,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                    },
+                    {
+                        label: 'Carbs',
+                        data: data.data.carbs,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                    },
+                    {
+                        label: 'Fat',
+                        data: data.data.fat,
+                        borderColor: 'rgba(175, 192, 192, 1)',
+                        backgroundColor: 'rgba(175, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                    },
+                ] : isCalories ? [
+                    {
+                        label: 'Calories In',
+                        data: data.data.calories_in,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                    },
+                    {
+                        label: 'Calories Out',
+                        data: data.data.calories_out,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                    },
+                ] : [
+                    {
+                        label: metric.charAt(0).toUpperCase() + metric.slice(1),
+                        data: data.data,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                    },
+                ];
+
+                window.progressChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: datasets,
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    font: {
+                                        size: 12,
+                                    },
                                 },
                             },
-                            scales: {
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Date',
-                                    }
-                                },
-                                y: {
-                                    title: {
-                                        display: true,
-                                        text: 'Calories',
-                                    },
-                                    beginAtZero: true,
-                                }
-                            }
-                        }
-                    });
-                } else {
-                    // General case for other metrics
-                    window.progressChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                label: metric.charAt(0).toUpperCase() + metric.slice(1),
-                                data: data.data,
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                borderWidth: 2,
-                                tension: 0.3,
-                            }]
                         },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: {
+                        scales: {
+                            x: {
+                                title: {
                                     display: true,
-                                    position: 'top',
+                                    text: 'Date',
+                                    font: {
+                                        size: 12,
+                                    },
                                 },
                             },
-                            scales: {
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Date',
-                                    }
-                                },
-                                y: {
-                                    title: {
-                                        display: true,
-                                        text: metric.charAt(0).toUpperCase() + metric.slice(1),
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: metric === 'pcf' ? 'PCF' : metric === 'calories' ? 'Calories' : metric.charAt(0).toUpperCase() + metric.slice(1),
+                                    font: {
+                                        size: 12,
                                     },
-                                    beginAtZero: true,
-                                }
-                            }
-                        }
-                    });
-                }
+                                },
+                                beginAtZero: true,
+                            },
+                        },
+                    },
+                });
             });
     });
 </script>
+
 
 
 
